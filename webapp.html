@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatXtract Loot Viewer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap');
+        @import url('https://cdn.le0x8.de/css/center');
+
+        html, body {font-family: sans-serif;}
+        th, td {text-align: left;}
+        td {padding-left: 1rem;}
+        #errbox {position: fixed; top: 31%; left: 31%; width: 33%; height: fit-content; max-height: 33%; overflow-x: revert; overflow-y: auto; padding: 1%; background-color: #f00; color: #fff; z-index: 100000;}
+        #errbox > h1 {font-variant: small-caps;}
+        #errok {margin-top: 1rem; width: 100%; border: 2.5px solid #fff; background-color: #f00; transition-duration: 250ms; color: #fff;}
+        #errok:hover {background-color: #fff; transition-duration: 250ms; color: #f00;}
+        #popbox {position: fixed; top: 31%; left: 31%; width: 33%; height: fit-content; max-height: 50%; overflow-x: revert; overflow-y: auto; padding: 1%; background-color: #08f; color: #fff; z-index: 100000; display: none;}
+        #popbox > h1 {font-variant: small-caps;}
+        #popok {margin-top: 1rem; width: 100%; border: 2.5px solid #fff; background-color: #08f; transition-duration: 250ms; color: #fff;}
+        #popok:hover {background-color: #fff; transition-duration: 250ms; color: #08f;}
+        #logo {position: fixed; top: 0; left: 0; font-family: 'Black Ops One', monospace; font-size: 2.5rem; color: #08f; width: 100%; height: 2.5rem; border-bottom: 2px solid #08f; padding: 0.5rem;}
+        #accounts {position: fixed; top: 3.5rem; left: 0; background-color: #08f; color: #fff; height: calc(100% - 4rem); width: 5%; padding: 0.25rem; overflow-x: revert; overflow-y: auto;}
+        #accounts > button {border: 0; background: 0; color: #fff; width: 100%; height: 1.5rem; text-align: center; border-bottom: 1px solid #fff; transition-duration: 250ms; border-left: 1px solid #08f;}
+        #accounts > button.acc-sel {background-color: #fff; color: #08f;}
+        #accounts > button.acc-element:hover {border-left: 1px solid #fff;}
+        #accounts > button:first-child {margin-bottom: 0.5rem;}
+        #content-buttons {position: fixed; top: 3.5rem; right: 0; width: 95%; height: 1.75rem;}
+        #content-buttons > button {border: 0; background: 0; color: #08f; width: calc(100% / 3); text-align: center; border-bottom: 1px solid #08f; transition-duration: 250ms; height: 100%;}
+        #content-buttons > button.cnt-sel {background-color: #08f; color: #fff;}
+        #content-buttons > button:hover {background-color: #08f; color: #fff;}
+        #main-win {position: fixed; top: 5.25rem; left: calc(5% + 0.5rem); width: calc(95% - 0.5rem); height: calc(100% - 5.25rem);}
+        .win {display: none; width: 100%; height: 97.5%; overflow-x: revert; overflow-y: auto; padding: 1rem;}
+        #contacts-g > tr > th, #contacts-c > tr > th, #chatlist > tr > th {padding-left: 1rem;}
+        .detailview, .chathistory, .chatdetail {color: #08f; text-decoration: underline; transition-duration: 250ms; padding: 0 1rem; text-decoration-color: #08f; cursor: pointer;}
+        .detailview:hover, .chathistory:hover, .chatdetail:hover {text-decoration-color: #fff;}
+        #members {transform: translateY(-48.5%);}
+        .ch-messages > * {width: 100%;}
+        .gm.ch-message-no {text-align: left; background-color: #bbb; position: relative; left: -1rem; margin-bottom: 0.125rem; padding: 0.25rem; padding-top: 2.5rem;}
+        .gm.ch-message-yes {text-align: right; background-color: #08f; color: #fff; position: relative; left: -1rem; margin-bottom: 0.125rem; padding: 0.25rem; padding-top: 2.25rem;}
+        .pm.ch-message-no {text-align: left; background-color: #bbb; position: relative; left: -1rem; margin-bottom: 0.125rem; padding: 0.25rem; padding-top: 0.25rem;}
+        .pm.ch-message-yes {text-align: right; background-color: #08f; color: #fff; position: relative; left: -1rem; margin-bottom: 0.125rem; padding: 0.25rem; padding-top: 0.25rem;}
+        .user-container {top: 0.25rem;}
+        .user {padding: 0.125rem; border-radius: 0.25rem; display: inline-block;}
+        .ch-message-no .user-container {position: absolute; left: 0.25rem;}
+        .ch-message-no .user {background-color: #444;}
+        .ch-message-yes .user-container {position: absolute; right: 0.25rem;}
+        .ch-message-yes .user {background-color: #44f;}
+        .linked-content {display: inline-block;}
+        .linked-content > * {top: unset; left: unset; display: inline-block;}
+        img, audio, video {clear: both; width: 50%;}
+        img.sticker {width: 10%;}
+
+        .btxtc-0 {color: #f88; border: 1px solid #f88;}
+        .btxtc-1 {color: #8f8; border: 1px solid #8f8;}
+        .btxtc-2 {color: #88f; border: 1px solid #88f;}
+        .btxtc-3 {color: #ff8; border: 1px solid #ff8;}
+        .btxtc-4 {color: #f8f; border: 1px solid #f8f;}
+        .btxtc-5 {color: #fff; border: 1px solid #fff;}
+        .btxtc-6 {color: #888; border: 1px solid #888;}
+        .btxtc-7 {color: #ace; border: 1px solid #ace;}
+        .btxtc-8 {color: #eac; border: 1px solid #eac;}
+        .btxtc-9 {color: #eca; border: 1px solid #eca;}
+    </style>
+</head>
+<body>
+    <div id="errbox">
+        <h1>Error</h1>
+        <span id="errmsg"><noscript>Activate JavaScript in your browser to use ChatXtract Loot Viewer.</noscript></span><br>
+        <button id="errok">OK</button>
+    </div>
+    <div id="popbox">
+        <h1 id="pophead">Info</h1>
+        <span id="popmsg">Some info here.</span><br>
+        <button id="popok">OK</button>
+    </div>
+    <div id="logo">ChatXtract Loot Viewer</div>
+    <div id="accounts"><button>Accounts</button></div>
+    <div id="content-buttons"><button nonce="0">General info</button><button nonce="1">Contacts</button><button nonce="2">Chats</button></div>
+    <div id="main-win">
+        <div id="selacctoview" class="c-element">Select an account to view its data!</div>
+        <div id="win-0" class="win">
+            <h2>General account info</h2>
+            <table>
+                <tr><th>Name</th><td id="accinfo-n">No data</td></tr>
+                <tr><th>Platform</th><td id="accinfo-p">No data</td></tr>
+                <tr><th>User ID</th><td id="accinfo-u">No data</td></tr>
+                <tr><th>Server</th><td id="accinfo-s">No data</td></tr>
+            </table>
+        </div>
+        <div id="win-1" class="win">
+            <h2>Contacts linked</h2>
+            <h3>Groups</h3>
+            <table><tbody id="contacts-g"><tr><th>Name</th><th>Group ID</th><th>Detail</th></tr><tr><td>No data</td><td>No data</td><td>No data</td></tr></tbody></table>
+            <h3>Contacts</h3>
+            <table><tbody id="contacts-c"><tr><th>Name</th><th>Alias</th><th>User ID</th><th>Detail</th></tr><tr><td>No data</td><td>No data</td><td>No data</td><td>No data</td></tr></tbody></table>
+        </div>
+        <div id="win-2" class="win">
+            <h2>Active chats</h2>
+            <table>
+                <tbody id="chatlist">
+                    <tr><th>Name</th><th>Chat ID</th><th>Unread messages</th><th>Last message</th><th>Detail</th><th>History</th></tr>
+                    <tr><td>No data</td><td>No data</td><td>No data</td><td>No data</td><td>No data</td><td>No data</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="win-3" class="win">
+            <span id="ch-top"></span>
+            <h2>Chat history of "<span id="ch-cname">No data</span>" (<span id="ch-cid">No data</span>)</h2>
+            <span id="ch-messages"></span>
+            <span id="ch-bottom"></span>
+        </div>
+    </div>
+    <script>
+        document.getElementById('errbox').style.display = 'none';
+        var contentNow;
+        var cachedAccId;
+        var cachedChatHistory;
+        var cachedChatHistoryOffset;
+        var account = {};
+        var miallowed = false;
+        var mmc = 25;
+        const buildMain = _ => {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/api/loots');
+            xhr.onreadystatechange = (event) => {
+                if (event.target.readyState == 4) {
+                    var rsp = JSON.parse(event.target.responseText);
+                    if (!rsp.error) {
+                        document.getElementById('errmsg').innerText = '';
+                        document.getElementById('errok').onclick = null;
+                        document.getElementById('errbox').style.display = 'none';
+                        rsp.forEach(account => {
+                            var accbox = document.createElement('button');
+                            accbox.classList.add('acc-element');
+                            accbox.onclick = initAcc;
+                            accbox.innerText = account;
+                            document.getElementById('accounts').appendChild(accbox);
+                        });
+                    } else {
+                        document.getElementById('errmsg').innerText = 'No loot folder found.\nRun ChatXtract again and press [OK].';
+                        document.getElementById('errok').onclick = buildMain;
+                        document.getElementById('errbox').style.display = 'block';
+                    };
+                };
+            };
+            xhr.send();
+            [...document.getElementById('content-buttons').children].forEach(button => {
+                button.onclick = initContents;
+            });
+        };
+        const initAcc = (event) => {
+            if (document.getElementsByClassName('acc-sel').length != 0) {document.getElementsByClassName('acc-sel')[0].classList.remove('acc-sel');};
+            event.target.classList.add('acc-sel');
+            buildAccount(event.target.innerHTML);
+        };
+        const initContents = (event) => {
+            if (document.getElementsByClassName('cnt-sel').length != 0) {document.getElementsByClassName('cnt-sel')[0].classList.remove('cnt-sel');};
+            event.target.classList.add('cnt-sel');
+            contentNow = event.target.nonce - 0;
+            clearWin();
+        };
+
+        alert = (text, header) => {
+            var hdr = header;
+            if (hdr == undefined){hdr = 'Information'};
+            document.getElementById('pophead').innerHTML = hdr;
+            document.getElementById('popmsg').innerHTML = text;
+            document.getElementById('popok').onclick = event => {event.target.parentElement.style.display = 'none';};
+            document.getElementById('popbox').style.display = 'block';
+        };
+
+        function escapeHtml(text) {
+            var map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        };
+
+        const yn = (bool) => {
+            if (bool == true) {return 'Yes';};
+            if (bool == false) {return 'No';};
+            return '???';
+        };
+
+        const unixdt = (timestamp) => {
+            var time = new Date(timestamp * 1000);
+            var timesuffix = '';
+            var timehours = 0;
+            if (time.getHours() < 12 && time.getHours() != 0) {timesuffix = 'am'; timehours = time.getHours();} else {timesuffix = 'pm'; timehours = time.getHours() - 12;};
+            if (time.getHours() == 0) {timehours = 12;};
+            return `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} &nbsp; ${timehours}:${time.getMinutes()}:${time.getSeconds()} ${timesuffix}`;
+        };
+
+        const mutestate = (timestamp) => {
+            if (timestamp == -1) {return 'till next Big Bang';};
+            if (timestamp == 0) {return 'No';};
+            return 'till ' + unixdt(timestamp);
+        };
+
+        const mediaInit = (message) => {
+            if (message.hasMedia && miallowed) {
+                if (message.type == 'image') {return `<img src="/api/getdata/binary/data_${cachedAccId}_${encodeURIComponent(message.id.remote)}_${message.id.id}.${encodeURIComponent(message._data.mimetype.replaceAll('/', 'Slash'))}"><br>`};
+                if (message.type == 'sticker') {return `<img class="sticker" src="/api/getdata/binary/data_${cachedAccId}_${encodeURIComponent(message.id.remote)}_${message.id.id}.${encodeURIComponent(message._data.mimetype.replaceAll('/', 'Slash'))}"><br>`};
+                if (message.type == 'ptt') {return `<audio controls src="/api/getdata/binary/data_${cachedAccId}_${encodeURIComponent(message.id.remote)}_${message.id.id}.${encodeURIComponent(message._data.mimetype.replaceAll('/', 'Slash'))}"></audio><br>`};
+                if (message.type == 'video') {return `<video controls src="/api/getdata/binary/data_${cachedAccId}_${encodeURIComponent(message.id.remote)}_${message.id.id}.${encodeURIComponent(message._data.mimetype.replaceAll('/', 'Slash'))}"></video><br>`};
+                console.log(message);
+                return '';
+            } else {return '';};
+        };
+
+        const groupmemberstr = (member, accountId) => {
+            var emblem = '';
+            var name;
+            if (member.isAdmin) {emblem = '\uD83D\uDCA0';};
+            if (member.isSuperAdmin) {emblem = '\u267E\uFE0F';};
+            if (account[accountId].sortedContacts[member.id.user]) {name = account[accountId].sortedContacts[member.id.user].name;};
+            if (!account[accountId].sortedContacts[member.id.user].name && account[accountId].sortedContacts[member.id.user].pushname) {name = account[accountId].sortedContacts[member.id.user].pushname;};
+            if (!name) {name = member.id.user;};
+            return name + ' ' + emblem;
+        };
+
+        const keyChatHistoryEvent = (event) => {
+            if (event.key == 'ArrowLeft') {
+                cachedChatHistoryOffset -= mmc;
+                loadChatMsgs();
+                return;
+            };
+            if (event.key == 'ArrowRight') {
+                cachedChatHistoryOffset += mmc;
+                loadChatMsgs();
+                return;
+            };
+            if (event.key == 'm') {
+                miallowed = !miallowed;
+                loadChatMsgs(true);
+                return;
+            };
+            if (event.key == '-') {
+                mmc -= 5;
+                loadChatMsgs(null);
+                return;
+            };
+            if (event.key == '+') {
+                mmc += 5;
+                loadChatMsgs(null);
+                return;
+            };
+        };
+
+        const clearWin = _ => {
+            window.removeEventListener('keydown', keyChatHistoryEvent);
+            document.getElementById('win-0').style.display = 'none';
+            document.getElementById('win-1').style.display = 'none';
+            document.getElementById('win-2').style.display = 'none';
+            document.getElementById('win-3').style.display = 'none';
+            document.getElementById('win-' + contentNow).style.display = 'block';
+            mmc = 5;
+        };
+
+        const loadChatMsgs = dontscroll => {
+            document.getElementById('ch-messages').innerHTML = '';
+            if (!!cachedChatHistory[0]._data.author) {
+                for (var i = cachedChatHistoryOffset; i < cachedChatHistoryOffset + mmc; i++) {
+                    var message = cachedChatHistory[i];
+                    document.getElementById('ch-messages').innerHTML += `
+                        <div class="gm ch-message-${yn(message._data.id.fromMe).toLowerCase()}">
+                            <div class="user-container"><div class="user btxtc-${('' + message._data.author.user).charAt(('' + message._data.author.user).length - 1)}">${groupmemberstr({id: message._data.author}, cachedAccId)}</div></div>
+                            <div class="main-msg">${mediaInit(message)}${escapeHtml(message.body).replaceAll('\n', '<br>')}</div>
+                        </div>
+                    `;
+                    if (message._data.mentionedJidList.length > 0) {
+                        message._data.mentionedJidList.forEach(ping => {
+                            document.getElementById('ch-messages').innerHTML = document.getElementById('ch-messages').innerHTML.replaceAll('@' + ping.user, `<div class="user btxtc-${('' + ping.user).charAt(('' + ping.user).length - 1)}">${groupmemberstr({id: ping}, cachedAccId)}</div>`);
+                        });
+                    };
+                };
+            } else {
+                for (var i = cachedChatHistoryOffset; i < cachedChatHistoryOffset + 75; i++) {
+                var message = cachedChatHistory[i];
+                document.getElementById('ch-messages').innerHTML += `
+                    <div class="pm ch-message-${yn(message._data.id.fromMe).toLowerCase()}">
+                        <div class="main-msg">${message.body}</div>
+                    </div>
+                `;
+                };
+            };
+            if (dontscroll === undefined || dontscroll == false) {document.getElementById('ch-top').scrollIntoView();};
+            if (dontscroll === null) {document.getElementById('ch-bottom').scrollIntoView();};
+        };
+
+        const buildAccount = id => {
+            if (account[id] == undefined) {
+                account[id] = {};
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/api/getdata/nobinary/clientinformation_' + id);
+                xhr.onreadystatechange = (event) => {
+                    if (event.target.readyState == 4) {
+                        account[id].info = JSON.parse(event.target.responseText);
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('GET', '/api/getdata/nobinary/contactslist_' + id);
+                        xhr.onreadystatechange = (event) => {
+                            if (event.target.readyState == 4) {
+                                account[id].contacts = JSON.parse(event.target.responseText);
+                                account[id].sortedContacts = [];
+                                account[id].sortedGroups = [];
+                                account[id].contacts.forEach(contact => {
+                                    if (!contact.isGroup) {
+                                        account[id].sortedContacts[contact.id.user] = contact;
+                                    } else {
+                                        account[id].sortedGroups[contact.id.user] = contact;
+                                    };
+                                });
+                                var xhr = new XMLHttpRequest();
+                                xhr.open('GET', '/api/getdata/nobinary/chatlist_' + id);
+                                xhr.onreadystatechange = (event) => {
+                                    if (event.target.readyState == 4) {
+                                        account[id].chats = JSON.parse(event.target.responseText);
+                                        account[id].sortedChats = [];
+                                        account[id].chats.forEach(chat => {
+                                            account[id].sortedChats[chat.id._serialized] = chat;
+                                        });
+                                        buildAccount(id);
+                                    };
+                                };
+                                xhr.send();
+                            };
+                        };
+                        xhr.send();
+                    };
+                };
+                xhr.send();
+            } else {
+                if (contentNow == undefined) {contentNow = 0; document.getElementById('content-buttons').children[0].classList.add('cnt-sel');};
+                document.getElementById('selacctoview').style.display = 'none';
+                clearWin();
+
+                // General info tab
+                document.getElementById('accinfo-n').innerHTML = account[id].info.pushname;
+                document.getElementById('accinfo-p').innerHTML = account[id].info.platform;
+                document.getElementById('accinfo-u').innerHTML = account[id].info.me.user;
+                document.getElementById('accinfo-s').innerHTML = account[id].info.me.server;
+
+                // Contacts tab
+                document.getElementById('contacts-g').innerHTML = '<tr><th>Name</th><th>Group ID</th><th>Detail</th></tr>';
+                var indexes = [];
+                Object.keys(account[id].sortedGroups).forEach(index => {indexes.push(index);});
+                indexes.forEach(group => {
+                    document.getElementById('contacts-g').innerHTML += `<tr><td>${account[id].sortedGroups[group].name}</td><td>${account[id].sortedGroups[group].id.user}</td><td class="detailview">View</td></tr>`.replaceAll('undefined', 'Unknown');
+                });
+                document.getElementById('contacts-c').innerHTML = '<tr><th>Name</th><th>Alias</th><th>User ID</th><th>Detail</th></tr>';
+                indexes = [];
+                Object.keys(account[id].sortedContacts).forEach(index => {indexes.push(index);});
+                indexes.forEach(contact => {
+                    document.getElementById('contacts-c').innerHTML += `<tr><td>${account[id].sortedContacts[contact].name}</td><td>${account[id].sortedContacts[contact].pushname}</td><td>${account[id].sortedContacts[contact].id.user}</td><td class="detailview">View</td></tr>`.replaceAll('undefined', 'Unknown');
+                });
+                Array.from(document.getElementsByClassName('detailview')).forEach(element => {element.onclick = event => {
+                    if (event.target.parentElement.parentElement.parentElement.previousSibling.previousSibling.innerText == 'Groups') {
+                        var group = account[id].sortedGroups[event.target.parentElement.children[1].innerHTML];
+                        alert(`
+                            <table><tbody>
+                                <tr><th>Name</th><td>${group.name}</td></tr>
+                                <tr><th>ID</th><td>${group.id.user}</td></tr>
+                                <tr><th>More details</th><td>Look for that in "Chats"</td></tr>
+                            </tbody></table>
+                        `, 'Detail group view');
+                    } else {
+                        var contact = account[id].sortedContacts[event.target.parentElement.children[2].innerHTML];
+                        alert(`
+                            <table><tbody>
+                                <tr><th>Name</th><td>${contact.name}</td></tr>
+                                <tr><th>Alias</th><td>${contact.pushname}</td></tr>
+                                <tr><th>Fist name</th><td>${contact.shortName}</td></tr>
+                                <tr><th>ID</th><td>${contact.id.user}</td></tr>
+                                <tr><th>WhatsApp account</th><td>${yn(contact.isWAContact)}</td></tr>
+                                <tr><th>Business account</th><td>${yn(contact.isBusiness)}</td></tr>
+                                <tr><th>Enterprise account</th><td>${yn(contact.isEnterprise)}</td></tr>
+                                <tr><th>Me</th><td>${yn(contact.isMe)}</td></tr>
+                                <tr><th>My contact</th><td>${yn(contact.isMyContact)}</td></tr>
+                                <tr><th>Blocked</th><td>${yn(contact.isBlocked)}</td></tr>
+                                <tr><th>More details</th><td>Look for that in "Chats"</td></tr>
+                            </tbody></table>
+                        `.replaceAll('undefined', 'Unknown'), 'Detail contact view');
+                    };
+                };});
+
+                // Chats tab
+                document.getElementById('chatlist').innerHTML = '<tr><th>Name</th><th>Chat ID</th><th>Unread messages</th><th>Last message</th><th>Detail</th><th>History</th></tr>';
+                account[id].chats.forEach(chat => {
+                    document.getElementById('chatlist').innerHTML += `<tr><td>${chat.name}</td><td>${chat.id._serialized}</td><td>${chat.unreadCount}</td><td>${unixdt(chat.timestamp)}</td><td class="chatdetail">View</td><td class="chathistory">View</td></tr>`;
+                });
+
+                Array.from(document.getElementsByClassName('chatdetail')).forEach(element => {
+                    element.onclick = (event) => {
+                        const chat = account[id].sortedChats[event.target.parentElement.children[1].innerHTML];
+                        if (chat.isGroup) {
+                            var members = '';
+                            chat.groupMetadata.participants.forEach(member => {
+                                members += '<li>' + groupmemberstr(member, id) + '</li>';
+                            });
+                            alert(`
+                                <table><tbody>
+                                    <tr><th>Name</th><td>${chat.name}</td></tr>
+                                    <tr><th>ID</th><td>${chat.id._serialized}</td></tr>
+                                    <tr><th>Read-only</th><td>${yn(!!chat.isReadOnly)}</td></tr>
+                                    <tr><th>Last message</th><td>${unixdt(chat.timestamp)}</td></tr>
+                                    <tr><th>Unread messages</th><td>${chat.unreadCount}</td></tr>
+                                    <tr><th>Pinned</th><td>${yn(chat.pinned)}</td></tr>
+                                    <tr><th>Muted</th><td>${mutestate(chat.muteExpiration)}</td></tr>
+                                    <tr><th>Archived</th><td>${yn(!!chat.archived)}</td></tr>
+                                    <tr><th>Group</th><td>${yn(chat.isGroup)}</td></tr>
+                                    <tr><th>Created</th><td>at ${unixdt(chat.groupMetadata.creation)} by ${groupmemberstr({id: chat.groupMetadata.owner}, id)}</td></tr>
+                                    <tr><th>Description</th><td id="group-desc">Loading...</td></tr>
+                                    <tr><th id="members">Members</th><td><ul>${members}</ul></td></tr>
+                                </tbody></table>
+                            `.replaceAll('undefined', 'Unknown'), 'Detail chat view');
+                            document.getElementById('group-desc').innerText = `${chat.groupMetadata.desc}`.replaceAll('undefined', 'Not set');
+                        } else {
+                            alert(`
+                                <table><tbody>
+                                    <tr><th>Name</th><td>${chat.name}</td></tr>
+                                    <tr><th>ID</th><td>${chat.id._serialized}</td></tr>
+                                    <tr><th>Read-only</th><td>${yn(!!chat.isReadOnly)}</td></tr>
+                                    <tr><th>Last message</th><td>${unixdt(chat.timestamp)}</td></tr>
+                                    <tr><th>Unread messages</th><td>${chat.unreadCount}</td></tr>
+                                    <tr><th>Pinned</th><td>${yn(chat.pinned)}</td></tr>
+                                    <tr><th>Muted</th><td>${mutestate(chat.muteExpiration)}</td></tr>
+                                    <tr><th>Archived</th><td>${yn(!!chat.archived)}</td></tr>
+                                    <tr><th>Group</th><td>${yn(chat.isGroup)}</td></tr>
+                                </tbody></table>
+                            `.replaceAll('undefined', 'Unknown'), 'Detail chat view');
+                        };
+                    };
+                });
+                Array.from(document.getElementsByClassName('chathistory')).forEach(element => {
+                    element.onclick = (event) => {
+                        const chat = account[id].sortedChats[event.target.parentElement.children[1].innerHTML];
+                        document.getElementById('ch-cname').innerHTML = chat.name;
+                        document.getElementById('ch-cid').innerHTML = chat.id._serialized;
+                        contentNow = 3;
+                        clearWin();
+                        contentNow = 2;
+                        cachedChatHistoryOffset = 0;
+                        miallowed = false;
+                        window.addEventListener('keydown', keyChatHistoryEvent);
+                        document.getElementById('ch-messages').innerHTML = 'Loading data, please wait...';
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('GET', '/api/getdata/nobinary/messagehistory_' + id + '_' + encodeURIComponent(chat.id._serialized));
+                        xhr.onreadystatechange = (event) => {if (event.target.readyState == 4) {
+                            cachedChatHistory = JSON.parse(event.target.responseText);
+                            cachedAccId = id;
+                            loadChatMsgs();
+                        };};
+                        xhr.send();
+                    };
+                });
+            };
+        };
+        buildMain();
+    </script>
+</body>
+</html>

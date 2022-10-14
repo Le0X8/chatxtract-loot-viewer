@@ -1,0 +1,20 @@
+{
+  "name": "cxtr-lw",
+  "version": "1.0.0",
+  "description": "Shows the ChatXtract loot.",
+  "main": "main.js",
+  "bin": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ChatXtract"
+  ],
+  "author": "LeoX DEV",
+  "license": "MIT",
+  "dependencies": {
+    "ansi-colors": "^4.1.3",
+    "fs": "^0.0.1-security",
+    "http": "^0.0.1-security"
+  }
+}
